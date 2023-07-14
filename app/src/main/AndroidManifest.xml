@@ -15,7 +15,7 @@
         android:theme="@style/Theme.TheTimesInterviewAssesment"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".list.CoinsListActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.TheTimesInterviewAssesment">
@@ -24,6 +24,9 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".detail.CoinDetailActivity">
+
         </activity>
     </application>
 

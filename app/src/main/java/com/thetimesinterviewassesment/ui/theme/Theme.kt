@@ -19,25 +19,33 @@ import androidx.compose.ui.text.TextStyle
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = GreenPrimary, // Status Bar
+    secondary = Green,
+    background = LightestGreen, // Cell container background
+    surface = LightestGreen, // Main Background
+    error = Color(0xFFB00020),
+    onPrimary = LightestGreen, //
+    onSecondary = Color.Red,
+    onBackground = Color.Magenta,
+    onSurface = Color.Blue,
+    onError = Color.White,
+    primaryContainer = LightGreen, // Floating button
+    secondaryContainer = Color.Green
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    primary = LightGreen, // Text
+    secondary = Green,
+    background = LightestGreen, // Cell container background
+    surface = LightestGreen, // Main Background
+    error = Color(0xFFB00020),
+    onPrimary = LightestGreen,
+    onSecondary = Color.Red,
+    onBackground = Color.Magenta, //
+    onSurface = Color.Blue,
+    onError = Color.White,
+    primaryContainer = LightGreen, //Floating button
+    secondaryContainer = Color.Green
 )
 
 @Composable
@@ -57,7 +65,6 @@ fun TheTimesInterviewAssesmentTheme(
         else -> LightColorScheme
     }
 
-
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
@@ -72,7 +79,7 @@ fun TheTimesInterviewAssesmentTheme(
         typography = Typography,
         content = {
             ProvideTextStyle(
-                value = TextStyle(color = Color.Black),
+                value = TextStyle(color = Color.White), // Default Text color
                 content = content
             )
         }

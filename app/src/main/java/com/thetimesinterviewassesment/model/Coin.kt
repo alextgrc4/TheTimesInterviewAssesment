@@ -6,13 +6,14 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Coin(
-    var position: Int,
     @JsonProperty("id") val id: String,
     @JsonProperty("name") val name: String,
     @JsonProperty("symbol") val symbol: String,
     @JsonProperty("rank") val rank: Int,
     @JsonProperty("type") val type: String,
     @JsonProperty("logo") val image: String? = "",
+    @JsonProperty("description") val description: String? = "",
+
 //    @JsonProperty("tags")val tags: List<Tag>,
 )
 

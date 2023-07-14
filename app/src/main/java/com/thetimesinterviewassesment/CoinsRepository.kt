@@ -11,9 +11,8 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import java.io.EOFException
-import kotlin.math.log
 
-class MainActivityRepository {
+class CoinsRepository {
 
     companion object {
         const val GET_COINS_URL = "https://api.coinpaprika.com/v1/coins"
@@ -22,30 +21,35 @@ class MainActivityRepository {
 
     private val objectMapper = jacksonObjectMapper()
 
-    suspend fun getCoins(): List<Coin> = withContext(Dispatchers.IO) {
+    suspend fun getCoins(): List<Coin>? = withContext(Dispatchers.IO) {
         val okHttpClient = OkHttpClient()
         parseGetCoinsResponse(okHttpClient.newCall(createRequest(GET_COINS_URL)).execute())
-
     }
 
-    private fun parseGetCoinsResponse(response: Response): List<Coin> {
+    private fun parseGetCoinsResponse(response: Response): List<Coin>? {
         return try {
             val jsonBody = response.body.string()
             objectMapper.readValue(jsonBody)
         } catch (e: EOFException) {
             Log.e(TAG, "parseGetCoinsResponse: ", e)
-            emptyList()
+            null
         }
     }
 
-    fun getCoinById(id: String): Coin {
+    suspend fun getCoinById(id: String): Coin? = withContext(Dispatchers.IO) {
         val okHttpClient = OkHttpClient()
-        return parseGetCoinByIdResponse(okHttpClient.newCall(createRequest(GET_COIN_BY_ID_URL, id)).execute())
+        parseGetCoinByIdResponse(okHttpClient.newCall(createRequest(GET_COIN_BY_ID_URL, id)).execute())
+            .takeUnless { id.isEmpty() }
     }
 
-    private fun parseGetCoinByIdResponse(response: Response): Coin {
-        val jsonBody = response.body.string()
-        return objectMapper.readValue(jsonBody)
+    private fun parseGetCoinByIdResponse(response: Response): Coin? {
+        return try {
+            val jsonBody = response.body.string()
+            objectMapper.readValue(jsonBody)
+        } catch (e: EOFException) {
+            Log.e(TAG, "parseGetCoinsResponse: ", e)
+            null
+        }
     }
 
     private fun createRequest(url: String, substitution: String? = null): Request {
