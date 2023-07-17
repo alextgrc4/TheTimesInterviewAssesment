@@ -19,33 +19,25 @@ import androidx.compose.ui.text.TextStyle
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = GreenPrimary, // Status Bar
-    secondary = Green,
+    primary = LightGreen, // Status Bar
+    secondary = DarkGreen,
     background = LightestGreen, // Cell container background
     surface = LightestGreen, // Main Background
-    error = Color(0xFFB00020),
     onPrimary = LightestGreen, //
-    onSecondary = Color.Red,
-    onBackground = Color.Magenta,
-    onSurface = Color.Blue,
-    onError = Color.White,
+    onSecondary = MediumGreen,
     primaryContainer = LightGreen, // Floating button
-    secondaryContainer = Color.Green
+    secondaryContainer = DarkestGreen
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = LightGreen, // Text
-    secondary = Green,
+    primary = LightGreen,
+    secondary = DarkGreen,
     background = LightestGreen, // Cell container background
     surface = LightestGreen, // Main Background
-    error = Color(0xFFB00020),
     onPrimary = LightestGreen,
-    onSecondary = Color.Red,
-    onBackground = Color.Magenta, //
-    onSurface = Color.Blue,
-    onError = Color.White,
+    onSecondary = MediumGreen,
     primaryContainer = LightGreen, //Floating button
-    secondaryContainer = Color.Green
+    secondaryContainer = DarkestGreen
 )
 
 @Composable

@@ -32,12 +32,12 @@ import com.thetimesinterviewassesment.ui.theme.GreenCoinItemBackground
 
 @Composable
 fun CoinListItem(
+    modifier: Modifier = Modifier,
     coin: Coin,
-    context: Context = LocalContext.current) {
-    context: Context = LocalContext.current
+    context: Context = LocalContext.current,
 ) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .padding(horizontal = 8.dp, vertical = 8.dp)
             .fillMaxWidth()
             .clickable {
@@ -47,7 +47,6 @@ fun CoinListItem(
             },
         colors = CardDefaults.cardColors(containerColor = GreenCoinItemBackground),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-
         shape = RoundedCornerShape(corner = CornerSize(16.dp)),
     ) {
         Row(

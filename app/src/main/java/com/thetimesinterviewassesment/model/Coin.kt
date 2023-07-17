@@ -13,8 +13,8 @@ data class Coin(
     @JsonProperty("type") val type: String,
     @JsonProperty("logo") val image: String? = "",
     @JsonProperty("description") val description: String? = "",
-
-//    @JsonProperty("tags")val tags: List<Tag>,
+    @JsonProperty("is_new") val isNew: Boolean? = false,
+    @JsonProperty("is_active") val isActive: Boolean? = false,
 )
 
 data class Tag(

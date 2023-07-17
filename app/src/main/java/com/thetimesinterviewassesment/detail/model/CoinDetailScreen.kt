@@ -71,7 +71,9 @@ fun CoinDetailScreen(coin: Coin) {
 @Composable
 fun CoinDetailContent(coin: Coin) {
     CoinDetailCard(coin)
-    CoinDescriptionCard(coin.description.orEmpty())
+    if (!coin.description.isNullOrEmpty()){
+        CoinDescriptionCard(coin.description)
+    }
 }
 
 @Composable
@@ -145,6 +147,7 @@ fun CoinImage(image: String? = "https://static.coinpaprika.com/coin/btc-bitcoin/
     }
 }
 
+@Preview
 @Composable
 fun CoinRank(rank: Int = 7) {
     Row(
@@ -157,7 +160,7 @@ fun CoinRank(rank: Int = 7) {
         )
         Box(modifier = Modifier.padding(horizontal = 5.dp)) {
             val image = painterResource(id = R.drawable.icn_rank)
-            Image(painter = image, contentDescription = null, modifier = Modifier.size(25.dp))
+            Image(painter = image, contentDescription = null, modifier = Modifier.size(30.dp))
             Text(
                 text = rank.toString(),
                 color = Color.White,
