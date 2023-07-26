@@ -1,6 +1,7 @@
 package com.thetimesinterviewassesment.list
 
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -44,13 +45,14 @@ import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
-import com.thetimesinterviewassesment.BaseActivity
 import com.thetimesinterviewassesment.CoinsRepository
 import com.thetimesinterviewassesment.ConnectivityHelper
 import com.thetimesinterviewassesment.R
 import com.thetimesinterviewassesment.list.model.CoinListItem
 import com.thetimesinterviewassesment.model.Coin
+import com.thetimesinterviewassesment.model.ErrorAlertDialog
 import com.thetimesinterviewassesment.model.FilterByContent
+import com.thetimesinterviewassesment.model.ProgressIndicator
 import com.thetimesinterviewassesment.model.SortByContent
 import com.thetimesinterviewassesment.ui.theme.Green
 import com.thetimesinterviewassesment.ui.theme.GreenAppBar
@@ -58,7 +60,7 @@ import com.thetimesinterviewassesment.ui.theme.LightGreen
 import com.thetimesinterviewassesment.ui.theme.MediumGreen
 import com.thetimesinterviewassesment.ui.theme.TheTimesInterviewAssesmentTheme
 
-class CoinsListActivity : BaseActivity() {
+class CoinsListActivity : ComponentActivity() {
 
     private lateinit var repository: CoinsRepository
     private lateinit var factory: CoinsListViewModelFactory
@@ -72,7 +74,8 @@ class CoinsListActivity : BaseActivity() {
 
         setContent {
             TheTimesInterviewAssesmentTheme {
-                val coinsUIState by viewModel.coinsListUiState.collectAsState()
+                val coinsListUIState by viewModel.coinsListUiState.collectAsState()
+                val coinsListSortType by viewModel.sortTypeStateState.collectAsState()
 
                 Surface(
                     modifier = Modifier
@@ -80,7 +83,8 @@ class CoinsListActivity : BaseActivity() {
                         .fillMaxSize()
                         .padding(15.dp),
                 ) {
-                    HomeContent(coinsUIState)
+                    HomeContent(coinsListUIState)
+                    ListSortType(coinsListSortType)
                 }
             }
         }
@@ -92,6 +96,15 @@ class CoinsListActivity : BaseActivity() {
             is CoinsListUIState.Loading -> ProgressIndicator(enabled = true)
             is CoinsListUIState.Success -> CoinsUI(list = coinsUIState.list)
             is CoinsListUIState.Error -> ErrorAlertDialog(error = coinsUIState.error)
+        }
+    }
+
+    @Composable
+    fun ListSortType(sortTypeState: SortByState) {
+        when (sortTypeState) {
+            is SortByState.Rank -> CoinsUI(list = sortTypeState.list)
+            is SortByState.Alphabetical -> CoinsUI(list = sortTypeState.list)
+            else -> {}
         }
     }
 
@@ -174,7 +187,7 @@ class CoinsListActivity : BaseActivity() {
             Column(
                 Modifier.weight(1f)
             ) {
-                SortCoinsBy(list)
+                SortCoinsBy()
             }
             Column(
                 Modifier.weight(1f)
@@ -269,10 +282,10 @@ class CoinsListActivity : BaseActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun SortCoinsBy(list: List<Coin>) {
+    fun SortCoinsBy() {
         val options = listOf(
-            SortByContent("Rank", R.drawable.icn_sort_rank, SortByState.Rank),
-            SortByContent("Alphabetical Order", R.drawable.icn_sort_alphabetical, SortByState.Alphabetical),
+            SortByContent("Rank", R.drawable.icn_sort_rank, SortByState.RankSelected),
+            SortByContent("Alphabetical Order", R.drawable.icn_sort_alphabetical, SortByState.AlphabeticalSelected),
         )
         var expanded by remember { mutableStateOf(false) }
         var selectedOptionText by remember { mutableStateOf(options[0].name) }
@@ -314,9 +327,10 @@ class CoinsListActivity : BaseActivity() {
                     DropdownMenuItem(
                         text = { Text(selectionOption.name) },
                         onClick = {
-                            selectedOptionText = selectionOption.name
                             expanded = false
-                            viewModel.sortBy(selectionOption.type, list)
+
+                            viewModel.sortBy(selectionOption.type)
+                            selectedOptionText = selectionOption.name
                         },
                         contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                         leadingIcon = {

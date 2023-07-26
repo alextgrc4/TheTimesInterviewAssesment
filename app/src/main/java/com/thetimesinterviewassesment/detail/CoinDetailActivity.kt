@@ -1,6 +1,7 @@
 package com.thetimesinterviewassesment.detail
 
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
@@ -9,12 +10,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelProvider
-import com.thetimesinterviewassesment.BaseActivity
 import com.thetimesinterviewassesment.CoinsRepository
 import com.thetimesinterviewassesment.detail.model.CoinDetailScreen
+import com.thetimesinterviewassesment.model.ErrorAlertDialog
+import com.thetimesinterviewassesment.model.ProgressIndicator
 import com.thetimesinterviewassesment.ui.theme.TheTimesInterviewAssesmentTheme
 
-class CoinDetailActivity : BaseActivity() {
+class CoinDetailActivity : ComponentActivity() {
 
     private lateinit var repository: CoinsRepository
     private lateinit var factory: CoinDetailViewModelFactory

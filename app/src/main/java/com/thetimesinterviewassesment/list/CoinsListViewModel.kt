@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.thetimesinterviewassesment.CoinsRepository
 import com.thetimesinterviewassesment.ConnectivityHelper
 import com.thetimesinterviewassesment.model.Coin
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -20,21 +21,22 @@ class CoinsListViewModel(
 
     // The UI collects from this StateFlow to get its state updates
     val coinsListUiState = _coinsListUiState.asStateFlow()
-    var coinList = listOf<Coin>()
-    var sortType: SortByState? = null
+
+    private val _sortTypeState = MutableStateFlow<SortByState>(SortByState.Unselected)
+    val sortTypeStateState = _sortTypeState.asStateFlow()
+
 
     init {
         getCoins()
     }
 
     private fun getCoins() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             if (connectivityHelper.isOnline()) {
                 val response = repository.getCoins()
                 if (response.isNullOrEmpty()) {
                     _coinsListUiState.emit(CoinsListUIState.Error("Something went wrong. Please try again."))
                 } else {
-                    coinList = response
                     _coinsListUiState.emit(CoinsListUIState.Success(response))
                 }
             } else {
@@ -43,22 +45,27 @@ class CoinsListViewModel(
         }
     }
 
-    fun sortBy(type: SortByState, list: List<Coin>) {
-        viewModelScope.launch {
-            sortType = type
-            val sortedList = if (SortByState.Alphabetical == type) {
-                val startsWithLetter = "^[a-zA-Z]".toRegex()
-                list.map { it.copy() }.filter { it.name.contains(startsWithLetter) && it.rank != 0 }.sortedBy { it.name }
-
-            } else {
-                list.map { it.copy() }.filterNot { it.rank == 0 }.sortedBy { it.rank }
+    fun sortBy(sortType: SortByState) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val list = when (val data = coinsListUiState.value) {
+                is CoinsListUIState.Success -> data.list
+                else -> emptyList()
             }
-            _coinsListUiState.emit(CoinsListUIState.Success(sortedList))
+
+            if (sortType == SortByState.AlphabeticalSelected) {
+                val startsWithLetter = "^[a-zA-Z]".toRegex()
+                val alphabeticalSortedList = list.map { it.copy() }.filter { it.name.contains(startsWithLetter) && it.rank != 0 }.sortedBy { it.name }
+                _sortTypeState.emit(SortByState.Alphabetical(alphabeticalSortedList))
+
+            } else if (sortType == SortByState.RankSelected) {
+                val rankSortedList = list.map { it.copy() }.filterNot { it.rank == 0 }.sortedBy { it.rank }
+                _sortTypeState.emit(SortByState.Rank(rankSortedList))
+            }
         }
     }
 
     fun filterBy(checked: Boolean, filterType: FilterByState, list: List<Coin>) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             if (checked) {
                 val filteredList = when (filterType) {
                     FilterByState.New -> list.map { it.copy() }.filter { it.isNew == true }
@@ -66,7 +73,7 @@ class CoinsListViewModel(
                 }
                 _coinsListUiState.emit(CoinsListUIState.Success(filteredList))
             } else {
-                sortType?.let { sortBy(it, coinList) }
+                sortBy(sortTypeStateState.value)
             }
         }
     }
@@ -79,9 +86,27 @@ sealed class CoinsListUIState {
 }
 
 sealed class SortByState {
-    object Rank : SortByState()
-    object Alphabetical : SortByState()
 
+    object Unselected : SortByState()
+
+    object RankSelected : SortByState()
+
+    object AlphabeticalSelected : SortByState()
+    data class Rank(val list: List<Coin> = listOf()) : SortByState()
+    data class Alphabetical(val list: List<Coin> = listOf()) : SortByState()
+
+//    companion object{
+//        fun sortBy(sortType: SortByState): List<Coin> {
+//
+//            val sortedList =if (sortType == Alphabetical){
+//                val startsWithLetter = "^[a-zA-Z]".toRegex()
+//                list.map { it.copy() }.filter { it.name.contains(startsWithLetter) && it.rank != 0 }.sortedBy { it.name }
+//            } else  {
+//                list.map { it.copy() }.filterNot { it.rank == 0 }.sortedBy { it.rank }
+//            }
+//            return sortedList
+//        }
+//    }
 }
 
 sealed class FilterByState {
